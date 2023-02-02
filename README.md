@@ -1,5 +1,5 @@
 # ScrapeNameAndRoleFromLinkedin
-A Selenium/Python program to scrape name from a linkedin page and the following and append all in one excel sheet
+A Selenium/Python program to scrape name, first name and role at company from a linkedin page and the following and append all in one excel sheet.
 
 
 This script logs into a LinkedIn account, navigates to a LinkedIn search results page, and retrieves the name, last name, and role of each of the 20 first people listed on the page.
@@ -24,3 +24,5 @@ Next, the script logs into the LinkedIn account by locating the username and pas
 
 After logging in, the script retrieves the name, last name, and role of each of the 10 first people listed on the LinkedIn search results page n_pages times.
 Each iteration, the script retrieves the data, creates a new set of data scraped from a linkedin page a paste it in an excel file
+
+If you start the program another time, it is going to append the new data in the same excel file.
