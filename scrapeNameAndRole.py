@@ -46,7 +46,7 @@ for n in range(1,n_pages):
     driver.get("https://www.linkedin.com/search/results/people/?network=["F"]&origin=FACETED_SEARCH&page=" + str(n))
     time.sleep(4)
 
-    # Initialize an empty list for storing data
+       # Initialize an empty list for storing data
     data = []
     # Locate the elements and subtitles
     elements = driver.find_elements(By.CSS_SELECTOR, ".entity-result__title-text")
@@ -62,10 +62,13 @@ for n in range(1,n_pages):
         last_name = name_parts[1]
         last_name = last_name.replace("View", "").strip()
         role = subtitle.text
+        role = role.replace("Current:", "").strip()
         # Append the data to the list
         data.append([first_name, last_name, role])
     # Create a pandas dataframe from the data 
     df = pd.DataFrame(data, columns=["First Name", "Last Name", "Role"])
+    df['Company'] = df['Role'].apply(lambda x: x.split(" at ")[1] if " at " in x else "")
+
 
 # Read the existing file into a pandas dataframe
     try:
@@ -78,5 +81,4 @@ for n in range(1,n_pages):
 
     # Write the final data to the same excel file
     final_df.to_excel("datoToExcel.xlsx", index=False, sheet_name='Sheet1', engine='openpyxl')
-
 
