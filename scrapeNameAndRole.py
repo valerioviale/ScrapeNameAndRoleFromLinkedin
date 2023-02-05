@@ -35,13 +35,13 @@ time.sleep(4)
 
 ###### end of the login process ################################################
 
-n_pages = 5 # number of pages you want to submit excluding the last one, range is not inclusive
+n_pages = 3 # number of pages you want to submit excluding the last one, range is not inclusive
 
 # Loop through each page
 for n in range(1,n_pages):
     # *** Add to the next line the page where you want to start to send messages, if you want to use recently added connection just remove +str(n)
     # and add https://www.linkedin.com/mynetwork/invite-connect/connections/
-    driver.get("https://www.linkedin.com/search/results/people/?origin=FACETED_SEARCH&page=" + str(n))
+    driver.get("https://www.linkedin.com/search/results/people/?geoUrn=%5B%22104738515%22%5D&origin=FACETED_SEARCH&page=" + str(n))
     time.sleep(4)
 
        # Initialize an empty list for storing data
@@ -50,8 +50,9 @@ for n in range(1,n_pages):
     elements = driver.find_elements(By.CSS_SELECTOR, ".entity-result__title-text")
     subtitles = driver.find_elements(By.CSS_SELECTOR, ".entity-result__primary-subtitle")
     # Select 20 elements and subtitles
-    selected_elements = elements[0:20]
-    selected_subtitles = subtitles[0:20]
+    selected_elements = elements[:]
+    selected_subtitles = subtitles[:]
+   
     # Loop through each element and subtitle
     for element, subtitle in zip(selected_elements, selected_subtitles):
         # Split the name into first and last name
@@ -59,12 +60,13 @@ for n in range(1,n_pages):
         first_name = name_parts[0]
         last_name = name_parts[1]
         last_name = last_name.replace("View", "").strip()
+        last_name = last_name.replace("'", "").strip()
         role = subtitle.text
         role = role.replace("Current:", "").strip()
         # Append the data to the list
         data.append([first_name, last_name, role])
     # Create a pandas dataframe from the data 
-    # use the separators to send the Company name to the proper column, sending to the excel only the second[1] part of the array
+    
     df = pd.DataFrame(data, columns=["First Name", "Last Name", "Role"])
     def extract_company(role):
         separators = [" at ", " en ", " @ ", " presso ", " bij ", " | ", " bei ", " chez "]
@@ -72,16 +74,27 @@ for n in range(1,n_pages):
             if separator in role:
                 return role.split(separator)[1]
         return ""   
-    # use the separators to clean the role column, sending to the excel only the first[0] part of the array
+
+  
+
     def extract_role(role):
         separators = [" at ", " en ", " @ ", " presso ", " bij ", " | ", " bei ", " chez "]
         for separator in separators:
             if separator in role:
                 return role.split(separator)[0]
         return role
-
+#extract the company name
     df['Company'] = df['Role'].apply(lambda x: extract_company(x))
+    df['Company'] = df['Company'].apply(lambda x: x.split()[:4])
+    df['Company'] = df['Company'].apply(lambda x: " ".join(x))
+#extract the role
     df['Role'] = df['Role'].apply(lambda x: extract_role(x))
+#extract the domain (the first word from Company name)
+    df['Domain'] = df['Company'].apply(lambda x: x.split()[0:1])
+    df['Domain'] = df['Domain'].apply(lambda x: " ".join(x))
+#build the email using the combination of names and domain
+    df['Email'] = (df['First Name'] + "." + df['Last Name'] + "@" + df['Domain'].str.replace("'", "") + ".com").str.lower()
+    
 
 # Read the existing file into a pandas dataframe
     try:
