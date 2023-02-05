@@ -32,10 +32,9 @@ submit = driver.find_element(By.XPATH,"//button[@type='submit']").click() #click
 
 time.sleep(4)
 
-### end of the login process
 
+###### end of the login process ################################################
 
-import random #we use random to have random salutations, Hola, Buenas...
 
 n_pages = 5 # number of pages you want to submit excluding the last one, range is not inclusive
 
