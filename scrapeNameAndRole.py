@@ -92,6 +92,8 @@ for n in range(1,n_pages):
 #extract the domain (the first word from Company name)
     df['Domain'] = df['Company'].apply(lambda x: x.split()[0:1])
     df['Domain'] = df['Domain'].apply(lambda x: " ".join(x))
+    df = df[df['Company'].astype(bool)]
+#if the Domain column is empty does not print anything
 #build the email using the combination of names and domain
     df['Email'] = (df['First Name'] + "." + df['Last Name'] + "@" + df['Domain'].str.replace("'", "") + ".com").str.lower()
     
