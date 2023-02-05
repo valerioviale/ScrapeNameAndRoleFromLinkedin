@@ -35,14 +35,13 @@ time.sleep(4)
 
 ###### end of the login process ################################################
 
-
-n_pages = 3 # number of pages you want to submit excluding the last one, range is not inclusive
+n_pages = 5 # number of pages you want to submit excluding the last one, range is not inclusive
 
 # Loop through each page
 for n in range(1,n_pages):
     # *** Add to the next line the page where you want to start to send messages, if you want to use recently added connection just remove +str(n)
     # and add https://www.linkedin.com/mynetwork/invite-connect/connections/
-    driver.get("https://www.linkedin.com/search/results/people/?geoUrn=%5B%2290009791%22%5D&keywords=nando&origin=FACETED_SEARCH&page=" + str(n))
+    driver.get("https://www.linkedin.com/search/results/people/?origin=FACETED_SEARCH&page=" + str(n))
     time.sleep(4)
 
        # Initialize an empty list for storing data
@@ -68,18 +67,25 @@ for n in range(1,n_pages):
     
     df = pd.DataFrame(data, columns=["First Name", "Last Name", "Role"])
     def extract_company(role):
-        separators = [" at ", " en ", " @ ", " presso "]
+        separators = [" at ", " en ", " @ ", " presso ", " bij ", " | ", " bei ", " chez "]
         for separator in separators:
             if separator in role:
                 return role.split(separator)[1]
         return ""   
 
-    df['Company'] = df['Role'].apply(lambda x: extract_company(x))
+    def extract_role(role):
+        separators = [" at ", " en ", " @ ", " presso ", " bij ", " | ", " bei ", " chez "]
+        for separator in separators:
+            if separator in role:
+                return role.split(separator)[0]
+        return role
 
+    df['Company'] = df['Role'].apply(lambda x: extract_company(x))
+    df['Role'] = df['Role'].apply(lambda x: extract_role(x))
 
 # Read the existing file into a pandas dataframe
     try:
-        existing_df = pd.read_excel("datoToExcel.xlsx")
+        existing_df = pd.read_excel("dataToExcel.xlsx")
         # Concatenate the existing data with the new data
         final_df = pd.concat([existing_df, df], ignore_index=True)
     except FileNotFoundError:
@@ -87,4 +93,4 @@ for n in range(1,n_pages):
         final_df = df
 
     # Write the final data to the same excel file
-    final_df.to_excel("datoToExcel.xlsx", index=False, sheet_name='Sheet1', engine='openpyxl')
+    final_df.to_excel("dataToExcel.xlsx", index=False, sheet_name='Sheet1', engine='openpyxl')
