@@ -64,7 +64,7 @@ for n in range(1,n_pages):
         # Append the data to the list
         data.append([first_name, last_name, role])
     # Create a pandas dataframe from the data 
-    
+    # use the separators to send the Company name to the proper column, sending to the excel only the second[1] part of the array
     df = pd.DataFrame(data, columns=["First Name", "Last Name", "Role"])
     def extract_company(role):
         separators = [" at ", " en ", " @ ", " presso ", " bij ", " | ", " bei ", " chez "]
@@ -72,7 +72,7 @@ for n in range(1,n_pages):
             if separator in role:
                 return role.split(separator)[1]
         return ""   
-
+    # use the separators to clean the role column, sending to the excel only the first[0] part of the array
     def extract_role(role):
         separators = [" at ", " en ", " @ ", " presso ", " bij ", " | ", " bei ", " chez "]
         for separator in separators:
