@@ -35,16 +35,14 @@ time.sleep(4)
 
 ###### end of the login process ################################################
 
-n_pages = 3 # number of pages you want to submit excluding the last one, range is not inclusive
-
 # Loop through each page
-for n in range(1,n_pages):
+for n in range(1, n_pages):
     # *** Add to the next line the page where you want to start to send messages, if you want to use recently added connection just remove +str(n)
     # and add https://www.linkedin.com/mynetwork/invite-connect/connections/
-    driver.get("https://www.linkedin.com/search/results/people/?geoUrn=%5B%22104738515%22%5D&origin=FACETED_SEARCH&page=" + str(n))
+    driver.get("https://www.linkedin.com/search/results/people/?geoUrn=%5B%22105646813%22%5D&origin=GLOBAL_SEARCH_HEADER&page=" + str(n))
     time.sleep(4)
 
-       # Initialize an empty list for storing data
+    # Initialize an empty list for storing data
     data = []
     # Locate the elements and subtitles
     elements = driver.find_elements(By.CSS_SELECTOR, ".entity-result__title-text")
@@ -52,55 +50,60 @@ for n in range(1,n_pages):
     # Select 20 elements and subtitles
     selected_elements = elements[:]
     selected_subtitles = subtitles[:]
-   
+
     # Loop through each element and subtitle
     for element, subtitle in zip(selected_elements, selected_subtitles):
         # Split the name into first and last name
         name_parts = element.text.split(" ")
         first_name = name_parts[0]
-        last_name = name_parts[1]
+        last_name = name_parts[1] 
         last_name = last_name.replace("View", "").strip()
         last_name = last_name.replace("'", "").strip()
         role = subtitle.text
         role = role.replace("Current:", "").strip()
         # Append the data to the list
         data.append([first_name, last_name, role])
-    # Create a pandas dataframe from the data 
-    
+    # Create a pandas dataframe from the data
+
     df = pd.DataFrame(data, columns=["First Name", "Last Name", "Role"])
+
     def extract_company(role):
-        separators = [" at ", " en ", " @ ", " presso ", " bij ", " | ", " bei ", " chez "]
+        separators = [" at ", " en ", " @ ", " presso ",
+                      " bij ", " | ", " bei ", " chez "]
         for separator in separators:
             if separator in role:
                 return role.split(separator)[1]
-        return ""   
-
-  
+        return ""
 
     def extract_role(role):
-        separators = [" at ", " en ", " @ ", " presso ", " bij ", " | ", " bei ", " chez "]
+        separators = [" at ", " en ", " @ ", " presso ",
+                      " bij ", " | ", " bei ", " chez "]
         for separator in separators:
             if separator in role:
                 return role.split(separator)[0]
         return role
-#extract the company name
+#create a mapping for special characters
+    def convert_special_characters(s):
+        mapping = str.maketrans("ğèéóòöàáäìíÀÁÂÃÄÅĀĂĄǍǞǠǺȀȂẠẢẤẦẨẪẬẮẰẲẴẶǺĄÈÉÊËĒĔĖĘĚȄȆẸẺẼẾỀỂỄỆÌÍÎÏĨĪĮİǏȈȊỈỊÒÓÔÕÖØŌŎŐǑǪǬǾȌȎȪỌỎỐỒỔỖỘỚỜỞỠỢÙÚÛÜŨŪŬŮŰŲǓǕǗǙǛȔȖỤỦỨỪỬỮỰÇĆĈĊČÐĎĐÑŃŅŇÞŢŤŦß",
+                                "geeoooaaaiiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEEEEEEEEEEEEEEEEEEEIIIIIIIIIIIIIoooooooooooooooooooooooooooouuuuuuuuuuuuuuuuuuuuuuuuCCCCCDDDNNNNTTTTs")
+        return s.translate(mapping)
+
     df['Company'] = df['Role'].apply(lambda x: extract_company(x))
     df['Company'] = df['Company'].apply(lambda x: x.split()[:4])
     df['Company'] = df['Company'].apply(lambda x: " ".join(x))
-#extract the role
+
     df['Role'] = df['Role'].apply(lambda x: extract_role(x))
-#extract the domain (the first word from Company name)
+
     df['Domain'] = df['Company'].apply(lambda x: x.split()[0:1])
     df['Domain'] = df['Domain'].apply(lambda x: " ".join(x))
     df = df[df['Company'].astype(bool)]
-#if the Domain column is empty does not print anything
-#build the email using the combination of names and domain
     df['Email'] = (df['First Name'] + "." + df['Last Name'] + "@" + df['Domain'].str.replace("'", "") + ".com").str.lower()
-    
+#filtering the mapping of special characters
+    df['Email'] = df['Email'].apply(convert_special_characters)
 
 # Read the existing file into a pandas dataframe
     try:
-        existing_df = pd.read_excel("dataToExcel.xlsx")
+        existing_df = pd.read_excel("dataToExcel.xls")
         # Concatenate the existing data with the new data
         final_df = pd.concat([existing_df, df], ignore_index=True)
     except FileNotFoundError:
@@ -108,4 +111,4 @@ for n in range(1,n_pages):
         final_df = df
 
     # Write the final data to the same excel file
-    final_df.to_excel("dataToExcel.xlsx", index=False, sheet_name='Sheet1', engine='openpyxl')
+    final_df.to_excel("dataToExcel.xls", index=False, sheet_name='Sheet1', engine='openpyxl')
