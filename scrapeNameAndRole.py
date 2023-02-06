@@ -34,6 +34,7 @@ time.sleep(4)
 
 
 ###### end of the login process ################################################
+n_pages = 3 # number of pages you want to submit excluding the last one, range is not inclusive
 
 # Loop through each page
 for n in range(1, n_pages):
@@ -66,7 +67,8 @@ for n in range(1, n_pages):
     # Create a pandas dataframe from the data
 
     df = pd.DataFrame(data, columns=["First Name", "Last Name", "Role"])
-
+    
+# use separators to separate role from company name, second element is company
     def extract_company(role):
         separators = [" at ", " en ", " @ ", " presso ",
                       " bij ", " | ", " bei ", " chez "]
@@ -75,6 +77,7 @@ for n in range(1, n_pages):
                 return role.split(separator)[1]
         return ""
 
+# use separators to separate role from company name, first element is role  
     def extract_role(role):
         separators = [" at ", " en ", " @ ", " presso ",
                       " bij ", " | ", " bei ", " chez "]
@@ -103,7 +106,7 @@ for n in range(1, n_pages):
 
 # Read the existing file into a pandas dataframe
     try:
-        existing_df = pd.read_excel("dataToExcel.xls")
+        existing_df = pd.read_excel("dataToExcel.xlsx")
         # Concatenate the existing data with the new data
         final_df = pd.concat([existing_df, df], ignore_index=True)
     except FileNotFoundError:
@@ -111,4 +114,4 @@ for n in range(1, n_pages):
         final_df = df
 
     # Write the final data to the same excel file
-    final_df.to_excel("dataToExcel.xls", index=False, sheet_name='Sheet1', engine='openpyxl')
+    final_df.to_excel("dataToExcel.xlsx", index=False, sheet_name='Sheet1', engine='openpyxl')
