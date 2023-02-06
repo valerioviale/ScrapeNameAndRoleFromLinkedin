@@ -99,6 +99,7 @@ for n in range(1, n_pages):
 
     df['Domain'] = df['Company'].apply(lambda x: x.split()[0:1])
     df['Domain'] = df['Domain'].apply(lambda x: " ".join(x))
+# IF company is empty, discard the line
     df = df[df['Company'].astype(bool)]
     df['Email'] = (df['First Name'] + "." + df['Last Name'] + "@" + df['Domain'].str.replace("'", "") + ".com").str.lower()
 #filtering the mapping of special characters
