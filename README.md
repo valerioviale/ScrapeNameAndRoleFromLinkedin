@@ -9,8 +9,7 @@ A Selenium/Python program to scrape name, first name and role at company from a 
 
 What to install? You need Python, Selenium, Webdriver, Pandas, Time. You can install them using pip:
 
-pip install selenium webdriver_manager pandas time
-pip install xlrd
+pip install selenium webdriver_manager pandas time xlrd
 
 
 This script logs into a LinkedIn account, navigates to a LinkedIn search results page, and retrieves the name, last name, and role of each of the people listed on the page, then progress to the following page.
