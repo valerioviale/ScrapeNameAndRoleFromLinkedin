@@ -10,7 +10,6 @@ import time
 import pandas as pd
 
 # Start the webdriver
-#driver = webdriver.Chrome("C:/Users/valerio/Desktop/Courses/LinkedinAuto/chromedriver.exe")
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install())) #starts the webdriver
 # Open LinkedIn
 driver.get("https://linkedin.com") #open a specific page
