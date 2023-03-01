@@ -33,7 +33,7 @@ time.sleep(4)
 
 
 ###### end of the login process ################################################
-n_pages = 3 # number of pages you want to submit excluding the last one, range is not inclusive
+n_pages =  # number of pages you want to submit excluding the last one, range is not inclusive
 
 # Loop through each page
 for n in range(1, n_pages):
